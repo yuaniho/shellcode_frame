@@ -7,7 +7,6 @@
 
 #include "../frame/frame.h"
 
-
 FRAME_FUNCTION void frame_memcpy(void* dst, void* src, size_t size);
 FRAME_FUNCTION void frame_memset(void* dst, const uint8_t value, size_t size);
 

@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include "members_x64.h"
+#include "members.h"
 #include "../frame/frame.h"
 
 FRAME_FUNCTION PPEB get_ppeb();
