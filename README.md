@@ -5,7 +5,7 @@
 和 x86 平台，x64 平台已经通过实验验证，x86 平台还有待验证。
 
   frame 文件夹提供 cmake 函数、框架宏 FRAME_FUNCTION 、 预设的函数签名头文件 function_signature.h 以及常用的宏常量头文件 frame_constant_marco.h ；
-cmake 用于快速编译出 exe ，同时使用 objcopy 提取 exe 中的 .payload 节的汇编代码作为导出的 shellcode ；框架宏 FRAME_FUNCTION 用于修饰函数，
+cmake 函数用于快速编译出 exe ，同时使用 objcopy 提取 exe 中的 .payload 节的汇编代码作为导出的 shellcode ；框架宏 FRAME_FUNCTION 用于修饰函数，
 将函数按照 C 语言约定导出并将汇编代码写入 .payload 节；
 
   frame_api 文件夹提供一些基本函数的简单实现，目前只有 frame_memcpy 和 frame_memset 函数，这两个函数和普通 memcpy 、 memset 函数功能一致。
@@ -184,3 +184,8 @@ cleanup:
     }
 }
 ```
+
+### 最后
+  shellcode 框架的实现基本思路大多数都是一致的，使用动态寻址寻找对应函数地址，最后通过函数指针的方式调用函数，避免引入导入表等内容导致 shellcode 依赖
+进程上下文或相关 PE 初始化。 shellcode_frame 项目获取当前已加载 DLL 的思路借鉴了 https://github.com/jackullrich/ShellcodeStdio 项目，感谢该项目作者
+提供的思路。
