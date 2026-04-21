@@ -5,6 +5,8 @@
 #ifndef SHELLCODE_BASIC_MEMBERS_H
 #define SHELLCODE_BASIC_MEMBERS_H
 
+#include "basic_macro.h"
+
 typedef void (WINAPI *pps_post_process_init_runtime)(void);
 
 typedef struct unicode_string_struct {
