@@ -5,6 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 include(frame/frame_cmake.cmake)
 
-build_shellcode(shellcode shellcode_entry
+build_shellcode(stager_shellcode
                 shellcode.cpp
 )

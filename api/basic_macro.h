@@ -5,7 +5,7 @@
 #ifndef SHELLCODE_BASIC_MACRO_H
 #define SHELLCODE_BASIC_MACRO_H
 
-#include "../frame/frame.h"
+#include "../frame/frame_basic_macro.h"
 
 #include <cstddef>
 #include <cstdint>

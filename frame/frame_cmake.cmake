@@ -1,4 +1,4 @@
-function(build_shellcode name shellcode_entry)
+function(build_shellcode name)
 
     add_executable(${name}
             ${ARGN}
@@ -27,7 +27,8 @@ function(build_shellcode name shellcode_entry)
     target_link_options(${name} PRIVATE
             -nostdlib
             -pie
-            "LINKER:--entry,${shellcode_entry}"
+            "LINKER:--subsystem,windows"
+            "LINKER:-T,${CMAKE_CURRENT_SOURCE_DIR}/frame/payload_section.ld"
             "LINKER:--gc-sections"
     )
 

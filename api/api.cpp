@@ -5,7 +5,7 @@
 #include "api.h"
 #include "members.h"
 #include "../hash/hash.h"
-#include "macro_function_x64.h"
+#include "macro_function.h"
 
 PPEB get_ppeb() {
     PPEB ppeb;
@@ -44,7 +44,7 @@ void* get_function_address_by_hash(const uint32_t module_name_hash, const uint32
         return nullptr;
     }
 
-    uint8_t* base = reinterpret_cast<uint8_t*>(module_base_address);
+    uint8_t* base = static_cast<uint8_t*>(module_base_address);
 
     const IMAGE_DOS_HEADER* dos_header = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
     const IMAGE_NT_HEADERS* nt_header = reinterpret_cast<IMAGE_NT_HEADERS*>(base + dos_header->e_lfanew);

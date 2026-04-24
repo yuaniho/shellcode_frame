@@ -8,7 +8,7 @@
 #include <cstdint>
 
 #include "members.h"
-#include "../frame/frame.h"
+#include "../frame/frame_basic_macro.h"
 
 FRAME_FUNCTION PPEB get_ppeb();
 FRAME_FUNCTION void* get_module_base_address(uint32_t module_name_hash);

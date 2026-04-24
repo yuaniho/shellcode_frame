@@ -4,29 +4,26 @@
 同时该文件夹下定义了框架中所需要的结构体、宏函数（从 mingw 相关头文件中提取）。理论上该文件夹定义的相关结构体和宏函数已经适配 x64 平台
 和 x86 平台，x64 平台已经通过实验验证，x86 平台还有待验证。
 
-  frame 文件夹提供 cmake 函数、框架宏 FRAME_FUNCTION 、 预设的函数签名头文件 function_signature.h 以及常用的宏常量头文件 frame_constant_marco.h ；
-cmake 函数用于快速编译出 exe ，同时使用 objcopy 提取 exe 中的 .payload 节的汇编代码作为导出的 shellcode ；框架宏 FRAME_FUNCTION 用于修饰函数，
-将函数按照 C 语言约定导出并将汇编代码写入 .payload 节；
+  frame 文件夹提供 cmake 函数、框架宏 FRAME_FUNCTION 、shellcode 入口函数修饰宏 SHELLCODE_ENTRY 、 预设的函数签名头文件 function_signature.h ， 
+用于控制内存布局的 ld 文件以及常用的宏常量头文件 frame_constant_marco.h ； cmake 函数用于快速编译出 exe ，同时使用 objcopy 提取 exe 中的 .payload 节的汇编代码
+作为导出的 shellcode ；框架宏 FRAME_FUNCTION 用于修饰函数， 将函数按照 C 语言约定导出并将汇编代码写入 .payload 节；
 
-  frame_api 文件夹提供一些基本函数的简单实现，目前只有 frame_memcpy 和 frame_memset 函数，这两个函数和普通 memcpy 、 memset 函数功能一致。
+  frame_api 文件夹提供一些基本函数的简单实现，目前只有 frame_memcpy 和 frame_memset 函数，这两个函数和普通 memcpy 、 memset 函数基本功能一致。
 
   hash 文件夹提供 hash 计算函数，用于 get_function_address 和 get_function_address_by_hash 函数的动态寻址。
 
 ### 使用示例
-  将本项目克隆到本地，在项目根目录下创建一个 cpp 文件，在文件中定义一个实现 shellcode 逻辑的函数，并使用 FRAME_FUNCTION 宏修饰；
-实现相关逻辑后，在 CMakeLists.txt 中调用提前准备好的 cmake 函数，cmake 函数的参数列表为 (产物名字 入口函数 入口函数所在 cpp 文件),
-最后构建即可。如果使用 Clion 编译器，构建后会在 cmake-build-* 目录下同时产出 exe 文件和 bin 文件，bin 文件即为我们所需的 shellcode。
+  将本项目克隆到本地，在项目根目录下创建一个 cpp 文件，在文件中定义一个实现 shellcode 逻辑的函数，并使用 SHELLCODE_ENTRY 宏修饰；
+实现相关逻辑后，在 CMakeLists.txt 中调用提前准备好的 cmake 函数，cmake 函数的参数列表为 (产物名字 入口函数所在 cpp 文件),
+最后构建即可。推荐使用 Clion IDE，该 IDE 自带 objdump 和 objcopy 工具，构建后会在 cmake-build-* 目录下同时产出 exe 文件和 bin 文件，
+bin 文件即为我们所需的 shellcode 。exe 文件可用于快速验证函数的正确性，无需再为 bin 文件运行做相关准备。
 
   创建 shellcode.cpp 文件，定义 shellcode_entry 函数实现 shellcode 逻辑，最后在 CMakeLists.txt 中设置 cmake 函数参数：
-  (shellcode shellcode_entry shellcode.cpp)
+  (shellcode shellcode.cpp)
 ```cpp
-#include "frame/function_signature.h"
-#include "frame/frame.h"
-#include "frame/frame_constant_macro.h"
-#include "api/api.h"
-#include "frame_api/frame_api.h"
+#include "frame/frame_macro.h"
 
-FRAME_FUNCTION void shellcode_entry(void) {
+SHELLCODE_ENTRY void shellcode_entry(void) {
     constexpr char kernel32_dll[] = "kernel32.dll";
     constexpr char load_lib_a[] = "LoadLibraryA";
     constexpr char win_http_dll[] = "winhttp.dll";

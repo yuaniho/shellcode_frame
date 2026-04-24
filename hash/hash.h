@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include "../frame/frame.h"
+#include "../frame/frame_basic_macro.h"
 
 FRAME_FUNCTION uint32_t ror(const uint32_t n);
 FRAME_FUNCTION char upper(const char c);

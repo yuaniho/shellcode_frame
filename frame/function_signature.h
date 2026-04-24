@@ -2,10 +2,12 @@
 // Created by YUAN on 2026/4/18.
 //
 
+// 定义函数签名头文件，保存函数签名
+
 #ifndef SHELLCODE_FUNCTION_SIGNATURE_H
 #define SHELLCODE_FUNCTION_SIGNATURE_H
 
-#include "frame.h"
+#include "frame_basic_macro.h"
 
 typedef int (WINAPI *fn_message_box_a)(
     void*,
